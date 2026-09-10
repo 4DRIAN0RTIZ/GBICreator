@@ -1,0 +1,258 @@
+{
+  "aplicacionValorSuperior": "Gobierno de Activos de TI — Quiero que mis activos sostengan la operación con un > costo justificado y un nivel de riesgo aceptable durante todo su ciclo de vida.",
+  "intencionSuperior": "Los activos tecnológicos en alcance se mantienen bajo responsabilidad definida, con > uso y permanencia justificados, condiciones de operación autorizadas y decisiones > oportunas de mantenimiento, renovación, recuperación o retiro, conforme a su > contribución al servicio, costo y riesgo.",
+  "hijos": [
+    {
+      "titulo": "Visibilidad e integridad del inventario",
+      "pregunta": "¿Realmente están reflejados todos mis activos, y la relación entre lo que tengo registrado y lo que existe en la red es confiable?",
+      "intencionSubyacente": "Los equipos, activos y relaciones ya registrados en el inventario se mantienen completos, correlacionados y vigentes, con evidencia continua suficiente para confiar en el dato sin tener que verificarlo.",
+      "politicas": [
+        "P01.1 Ningún equipo dentro del dominio de gestión carece de identificación mínima obligatoria: tipo de activo, estado del ciclo de vida, MAC y número de serie.",
+        "P01.2 El 100% de los activos con evidencia de presencia en red mantienen una relación única y vigente con su equipo correspondiente; toda inconsistencia detectada se registra y notifica en menos de 24 horas.",
+        "P01.3 Ningún activo crítico permanece sin clasificar más allá del plazo acordado desde su detección.",
+        "P01.4 Toda identidad o relación inconsistente detectada se concilia con responsable y plazo asignado; ningún registro ambiguo se trata como identidad validada."
+      ],
+      "metricasValor": [
+        "Equipos registrados con información mínima completa.",
+        "Inconsistencias detectadas entre MAC, equipo y hardware, resueltas dentro de 24 horas.",
+        "Antigüedad de la última evidencia por activo.",
+        "Activos con evidencia obligatoria vigente sobre activos en alcance."
+      ],
+      "metricasControl": [
+        "Equipos críticos sin identificación.",
+        "Relaciones sin resolver, por antigüedad.",
+        "Hosts detectados (AD/red) vs. hosts registrados en TechFlow.",
+        "Hallazgos confirmados por evidencia faltante o inconsistencias de activos.",
+        "Identidades o relaciones ambiguas pendientes, y antigüedad."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Reducir la exposición a incidentes por dispositivos no autorizados (Shadow IT)",
+      "pregunta": "¿Los dispositivos desconocidos quedan bloqueados y los conocidos operan con autorización vigente? ¿Tengo claro todo lo que está conectado a mi red, incluso lo que nadie registró?",
+      "intencionSubyacente": "Los dispositivos que no puedan identificarse como activos conocidos y autorizados permanecen sin acceso a la red de producción hasta completar su identificación y autorización, salvo excepciones vigentes aprobadas. Todo dispositivo con evidencia técnica de presencia en la red pero sin relación formal en el inventario queda identificado, clasificado y resuelto mediante una decisión gobernada.",
+      "politicas": [
+        "P02.1 Toda nueva presencia detectada se contrasta con el inventario y la fuente de autorización — una MAC registrada o el alta automática no acreditan autorización.",
+        "P02.2 Todo dispositivo detectado en red sin equipo asociado queda en un estado de revisión definido dentro de las 72 horas siguientes a su detección; ninguno permanece sin estado.",
+        "P02.3 Todo dispositivo con señales suficientes de riesgo tiene una disposición formal (bloqueado, exceptuado o formalizado) dentro del umbral de días definido por negocio.",
+        "P02.4 Todo dispositivo desconocido o sin autorización debe bloquearse para producción dentro del plazo aprobado; solo puede conservar acceso de cuarentena para regularización. La restricción se dirige al dispositivo o sesión — solo se apaga un puerto si se confirma que no afecta equipos o servicios compartidos.",
+        "P02.5 Ningún bloqueo se ejecuta sin una ventana de gracia notificada previamente, sin un mecanismo de reversión auditado disponible, o de forma silenciosa.",
+        "P02.6 El acceso se restituye con identidad validada, responsable asignado y autorización vigente. Toda excepción define justificación, responsable, alcance y vencimiento; al vencer se reevalúa y restringe según corresponda.",
+        "P02.7 El bloqueo debe verificarse — si falla, se mantiene la exposición abierta y se escala."
+      ],
+      "metricasValor": [
+        "Exposición observada: minutos con acceso no autorizado por dispositivo.",
+        "Porcentaje de dispositivos con disposición formal sobre el total detectado.",
+        "Tiempo promedio de exposición: desde la detección hasta la disposición formal."
+      ],
+      "metricasControl": [
+        "Contención oportuna: casos bloqueados y verificados dentro del plazo / casos cuyo plazo vence en el periodo.",
+        "Tiempo de contención: mediana y P95 desde detección hasta bloqueo verificado.",
+        "Bloqueos incorrectos: número confirmado y minutos de servicio afectados.",
+        "Excepciones vencidas que conservan acceso; restituciones sin autorización vigente.",
+        "Dispositivos en espera de bloqueo, bloqueados, o exceptuados."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Control, autorización y trazabilidad de cambios sobre el inventario",
+      "pregunta": "¿Puedo garantizar que todo lo que dice mi inventario tiene un motivo de negocio real detrás? ¿Puedo conocer quién solicitó un cambio y cuál fue su resultado?",
+      "intencionSubyacente": "Toda alta, actualización, asignación o retiro de activos queda vinculada a un origen autorizado y a un proceso de gestión válido antes de ejecutarse, y todo cambio — automatizado o manual — es identificable hasta el proceso específico que lo originó y queda registrado con resultado verificable.",
+      "politicas": [
+        "P03.1 El 95% o más de las operaciones de alta o actualización deben requerir un ticket asociado y válido antes de ejecutarse.",
+        "P03.2 El ticket referenciado debe validarse contra el sistema de gestión (existe, está abierto, corresponde al tipo de operación) antes de ejecutar el cambio — no solamente al notificar el resultado.",
+        "P03.3 Toda operación automatizada debe identificar el proceso específico que la originó, no solo que fue automatizada.",
+        "P03.4 Las altas y cambios gestionados deben vincular ticket, ejecución y activo; cada ejecución registra su resultado y los errores tienen seguimiento.",
+        "P03.5 Toda operación del módulo — alta, actualización, asignación o retiro, no solo las gestionadas por ticket — conserva origen, fecha, actor, cambios y resultado vinculado al activo.",
+        "P03.6 La tasa de procesamiento exitoso debe ser ≥98% por ciclo, medida sobre el total de operaciones del módulo (no solo altas y cambios)."
+      ],
+      "metricasValor": [
+        "Porcentaje de operaciones ejecutadas con ticket válido vs. sin ticket.",
+        "Distribución de operaciones por proceso de origen específico.",
+        "Ejecuciones con mutación exitosa."
+      ],
+      "metricasControl": [
+        "Número de operaciones ejecutadas sin ticket asociado.",
+        "Número de operaciones rechazadas por ticket inválido o inexistente.",
+        "Tiempo entre la validación del ticket y la ejecución del cambio.",
+        "Ejecuciones fallidas de altas y cambios.",
+        "Operaciones exitosas sobre operaciones intentadas, por flujo y ciclo — reportar también omitidas y no evaluables."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Vigencia contractual",
+      "pregunta": "¿Mis activos cumplen con las condiciones de vigencia contractual requeridas?",
+      "intencionSubyacente": "Los activos con atributos de vigencia contractual (contratos, licencias, suscripciones) mantienen fecha de vencimiento registrada y visible, generando alertamiento y seguimiento formal antes de su expiración.",
+      "politicas": [
+        "P04.1 El 100% de los activos con atributos de vigencia contractual deben tener fecha de vencimiento registrada, y el 100% de los vencimientos dentro de la ventana acordada deben generar alerta y seguimiento formal antes del vencimiento.",
+        "P04.2 Identificar responsable y fechas contractuales relevantes (contratos, licencias, suscripciones) para cada activo aplicable, con seguimiento anticipado a cada vencimiento.",
+        "P04.3 Antes del vencimiento, ejecutar renovación o sustitución, o aprobar una excepción con medidas compensatorias y plazo — una alerta o un ticket por sí solos no resuelven la exposición."
+      ],
+      "metricasValor": [
+        "Activos con fecha de vigencia contractual registrada.",
+        "Vencimientos resueltos oportunamente sobre vencimientos relevantes del periodo."
+      ],
+      "metricasControl": [
+        "Activos vencidos sin resolución, y antigüedad del vencimiento.",
+        "Días de anticipación entre decisión ejecutada y vencimiento."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Riesgo técnico por obsolescencia de hardware (EoL/EoS)",
+      "pregunta": "¿Sé qué activos están operando fuera de garantía o soporte del fabricante, y puedo anticiparlo?",
+      "intencionSubyacente": "Los activos de hardware mantienen registro vigente de su estado de garantía y de las fechas de fin de vida (EoL) y fin de soporte (EoS) declaradas por el fabricante, generando alertamiento anticipado para permitir decisiones de renovación, reemplazo o mitigación de riesgo antes de operar fuera de soporte.",
+      "politicas": [
+        "P05.1 El 100% de los activos de hardware en alcance deben tener registrado su estado de garantía y, cuando aplique, sus fechas de EoL y EoS.",
+        "P05.2 Identificar servicio, criticidad y fechas relevantes de soporte y garantía del fabricante para cada activo de hardware aplicable, con seguimiento anticipado.",
+        "P05.3 Ningún activo crítico permanece operando más allá de su fecha de EoS sin una decisión formal registrada (reemplazo planeado, mitigación de riesgo aceptada, o excepción documentada)."
+      ],
+      "metricasValor": [
+        "Activos con garantía/EoL/EoS registrado."
+      ],
+      "metricasControl": [
+        "Activos próximos a EoL/EoS/vencimiento de garantía dentro de la ventana acordada.",
+        "Activos críticos sin cobertura requerida ni excepción vigente."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Optimización de costos y capacidad",
+      "pregunta": "¿Estoy pagando por activos, licencias o suscripciones que ya no se usan? ¿Compramos y renovamos únicamente recursos necesarios, considerando lo que ya tenemos? ¿Las licencias contratadas cubren la demanda real sin saturarse ni desperdiciarse?",
+      "intencionSubyacente": "Las adquisiciones y renovaciones responden a una necesidad justificada y consideran uso, existencias y posibilidades de reutilización para controlar el costo del ciclo de vida. Las licencias y suscripciones se mantienen alineadas con la demanda real de uso, sin saturación ni subutilización sostenida.",
+      "politicas": [
+        "P06.1 Antes de comprar, verificar disponibilidad de activos aptos y documentar la decisión de reutilizar o adquirir. (Base también consultada por la Aplicación 11, P11.2 — mismo inventario de existencias, no se recalcula por separado.)",
+        "P06.2 Antes de renovar licencias, contratos o suscripciones, validar necesidad, uso, costo y responsable.",
+        "P06.3 Los recursos sin uso justificado se revisan para reasignación, reducción o cancelación según condiciones contractuales.",
+        "P06.4 Ninguna licencia debe operar con uso superior al 100% de los asientos contratados sin un plan de ampliación vigente, y ninguna licencia debe permanecer subutilizada por debajo de un umbral acordado más de N meses sin justificación.",
+        "P06.5 Toda declaración de ahorro debe tener evidencia de ejecución y validación financiera; separar ahorro realizado, compra evitada y valor recuperado."
+      ],
+      "metricasValor": [
+        "Ahorro neto realizado, validado por Finanzas.",
+        "Renovaciones con necesidad, uso y costo validados sobre renovaciones decididas.",
+        "Porcentaje de utilización por licencia/suscripción."
+      ],
+      "metricasControl": [
+        "Costo del periodo de recursos pagados sin uso justificado.",
+        "Porcentaje de licencias sobre-utilizadas (uso > contratado) y subutilizadas.",
+        "Gasto asociado a activos inactivos con contratos/licencias/suscripciones vinculadas.",
+        "Tiempo desde identificación de recurso sin uso hasta decisión ejecutada."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Recuperación y custodia de equipos",
+      "pregunta": "¿Sabemos quién tiene cada activo y recuperamos los equipos cuando dejan de ser necesarios?",
+      "intencionSubyacente": "Los activos mantienen custodia verificable hasta su devolución, transferencia o disposición, y los recursos recuperados se evalúan para su aprovechamiento.",
+      "politicas": [
+        "P07.1 Todo activo entregado debe tener responsable, ubicación y evidencia de custodia vigentes.",
+        "P07.2 Todo cambio o salida del responsable debe conciliar los activos asignados y establecer devolución o transferencia con plazo.",
+        "P07.3 La falta sostenida de evidencia de custodia inicia investigación; no demuestra abandono ni autoriza una baja automática.",
+        "P07.4 Cerrar la recuperación con recepción verificada, condición del activo y destino aprobado; investigar faltantes y escalar atrasos."
+      ],
+      "metricasValor": [
+        "Valor de activos físicamente recuperados y efectivamente reasignados.",
+        "Devoluciones completas en plazo sobre devoluciones cuyo plazo vence en el periodo.",
+        "Activos con custodia vigente sobre activos sujetos a custodia."
+      ],
+      "metricasControl": [
+        "Valor de activos no recuperados al corte (separar extravío confirmado de devolución pendiente).",
+        "Tiempo mediano de recuperación desde solicitud hasta recepción verificada.",
+        "Número de pérdidas confirmadas en el periodo.",
+        "Devoluciones vencidas y antigüedad de pendientes."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Retiro seguro de activos",
+      "pregunta": "¿Los equipos retirados dejan de conservar accesos y datos fuera de las condiciones autorizadas?",
+      "intencionSubyacente": "El retiro de activos concluye con la revocación de accesos y el tratamiento de datos aplicables verificados, conservando evidencia de su destino final.",
+      "politicas": [
+        "P08.1 Toda baja identifica accesos, datos y servicios asociados, así como responsables de las acciones de retiro.",
+        "P08.2 No cerrar el retiro hasta verificar revocación de accesos y evidencia del tratamiento de datos requerido.",
+        "P08.3 La disposición o transferencia final debe tener autorización y evidencia de entrega o tratamiento correspondiente.",
+        "P08.4 La reaparición en red de un activo retirado debe activar restricción y revisión; cualquier reactivación requiere autorización nueva."
+      ],
+      "metricasValor": [
+        "Activos retirados con acceso efectivo vigente al corte (objetivo: cero).",
+        "Retiros seguros completos en plazo sobre retiros cuyo plazo vence en el periodo."
+      ],
+      "metricasControl": [
+        "Retiros sin evidencia de tratamiento de datos aplicable.",
+        "Tiempo desde orden de baja hasta revocación verificada.",
+        "Incidentes confirmados asociados a accesos o datos residuales de activos retirados.",
+        "Reapariciones de activos retirados con acceso a producción."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Resiliencia de activos críticos",
+      "pregunta": "¿La falla o pérdida de un activo crítico deja de detener la operación?",
+      "intencionSubyacente": "Los activos críticos conservan un mecanismo de respaldo, reemplazo o redundancia que permite sostener la operación ante su falla o pérdida.",
+      "politicas": [
+        "P09.1 Todo activo clasificado como crítico debe contar con un plan de respaldo/reemplazo vigente.",
+        "P09.2 Todo plan de respaldo debe validarse periódicamente — un plan no probado equivale a no tener plan."
+      ],
+      "metricasValor": [
+        "Activos críticos con plan de respaldo vigente."
+      ],
+      "metricasControl": [
+        "Activos críticos sin plan de respaldo.",
+        "Antigüedad de la última validación del plan, por activo crítico."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Tablero de gobernanza y evidencia para auditoría externa",
+      "pregunta": "¿Podemos demostrar, con evidencia, el estado y la cobertura de nuestros activos TI ante dirección, auditoría o el regulador — sin reconstruir la información desde cero cada vez que se pide?",
+      "intencionSubyacente": "El estado del inventario, sus vigencias y sus inconsistencias se encuentran disponibles en un tablero de gobernanza consultable en cualquier momento, y todo reporte de cumplimiento o auditoría generado es reproducible y trazable a la fecha de corte de los datos origen — sin depender de recopilar evidencia manualmente cada vez que se solicita.",
+      "politicas": [
+        "P10.1 El 100% de las métricas de cobertura, vigencia y correlación definidas en este documento deben estar disponibles en el tablero de gobernanza, con una frecuencia de actualización dentro del umbral acordado.",
+        "P10.2 Todo reporte de cumplimiento o auditoría generado debe ser reproducible (misma consulta, mismos filtros) y trazable a la fecha de corte de los datos origen."
+      ],
+      "metricasValor": [
+        "Horas de preparación de evidencia por auditoría de alcance comparable (objetivo: a la baja).",
+        "Disponibilidad del tablero de gobernanza (uptime)."
+      ],
+      "metricasControl": [
+        "Cobertura de métricas definidas vs. publicadas en el tablero.",
+        "Reportes de cumplimiento/auditoría generados vs. solicitados."
+      ],
+      "collapsed": false,
+      "hijos": []
+    },
+    {
+      "titulo": "Tiempo de entrega de equipos",
+      "pregunta": "¿Entregamos o sustituimos equipos operativos a tiempo, aprovechando los activos disponibles?",
+      "intencionSubyacente": "Los recursos aptos se asignan o sustituyen oportunamente según la necesidad operativa y la prioridad del servicio, aprovechando las existencias disponibles.",
+      "politicas": [
+        "P11.1 Toda solicitud identifica necesidad, prioridad, fecha requerida y responsable de entrega.",
+        "P11.2 Reutilizar la verificación de existencias aptas de la Aplicación 6 (P06.1) antes de adquirir; mantener información de condición y disponibilidad vigente.",
+        "P11.3 Asignar, preparar y entregar dentro del plazo aprobado para la prioridad; confirmar recepción y funcionamiento."
+      ],
+      "metricasValor": [
+        "Tiempo mediano y P95 desde solicitud válida hasta entrega de equipo operativo confirmada.",
+        "Entregas operativas en plazo sobre solicitudes cuyo plazo vence en el periodo.",
+        "Equipos disponibles y aptos para asignación al corte."
+      ],
+      "metricasControl": [
+        "Solicitudes vencidas sin equipo operativo al corte.",
+        "Solicitudes resueltas con existencias sobre solicitudes atendidas.",
+        "Entregas con falla inicial que requieren sustitución o retrabajo."
+      ],
+      "collapsed": false,
+      "hijos": []
+    }
+  ],
+  "sueltos": []
+}

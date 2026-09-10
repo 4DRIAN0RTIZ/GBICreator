@@ -1,0 +1,1217 @@
+:root {
+  --bg: #f4f5f7;
+  --panel: #ffffff;
+  --border: #c9cdd6;
+  --line: #9aa2b1;
+  --text: #1f2430;
+  --muted: #6b7280;
+  --accent: #3b5bdb;
+  --accent-light: #dce4ff;
+  --superior: #b8cce4;
+  --superior-text: #1f2430;
+  --danger: #c0392b;
+  --card-w: 250px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+#app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  align-items: center;
+  gap: 26px;
+}
+
+#app-header h1 {
+  font-size: 18px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+#app-header h1 img {
+  display: block;
+  width: auto;
+  height: 56px;
+  filter: drop-shadow(0 1px 1px rgba(31, 36, 48, .9)) drop-shadow(0 0 3px rgba(31, 36, 48, .55));
+}
+
+.toolbar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 14px;
+  border-right: 1px solid var(--border);
+}
+
+.toolbar-group:last-of-type {
+  border-right: none;
+  padding-right: 0;
+}
+
+.project-group {
+  flex: 1 1 360px;
+}
+
+.project-picker {
+  max-width: 240px;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 28px 6px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+}
+
+.save-status {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 90px;
+}
+
+button {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+}
+
+button:hover { background: #eef1f6; }
+
+.icon-tool-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.primary-btn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.primary-btn:hover { background: #2f49b0; }
+
+.danger-btn {
+  background: #fff;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.danger-btn:hover { background: #fbeceb; }
+
+/* --- Bandeja de nodos aislados --- */
+#isolated-tray {
+  background: #fff8e6;
+  border-bottom: 1px solid #e9d8a6;
+  padding: 8px 20px;
+}
+
+#isolated-tray.hidden { display: none; }
+
+.tray-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8a6d1d;
+  margin-bottom: 6px;
+}
+
+.tray-list {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.tray-chip {
+  flex-shrink: 0;
+  width: 220px;
+  background: #fff;
+  border: 1px solid #e9d8a6;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.tray-chip .node-badges {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.tray-chip .badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.tray-chip .titulo {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tray-chip .tray-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.tray-chip .tray-actions button {
+  font-size: 11px;
+  padding: 3px 7px;
+  flex: 1;
+}
+
+.tray-chip .connect-btn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* --- Modal "Conectar nodo" --- */
+#connect-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  max-width: 90vw;
+  background: var(--panel);
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.25);
+  padding: 18px;
+  z-index: 32;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#connect-modal.hidden { display: none; }
+
+#connect-modal h2 { margin: 0; font-size: 15px; }
+
+.modal-desc {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+}
+
+#connect-modal select {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+#chart-scroll {
+  position: relative;
+  overflow: hidden;
+  height: calc(100vh - 77px);
+  cursor: grab;
+  background-color: #eef0f4;
+  background-image: radial-gradient(circle, #cbd0da 1.4px, transparent 1.4px);
+  background-size: 24px 24px;
+  user-select: none;
+}
+
+#chart-scroll.panning {
+  cursor: grabbing;
+}
+
+#tree-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  padding: 40px 20px;
+}
+
+/* El navegador aún permite seleccionar texto dentro de los campos del
+   editor lateral, aunque el canvas tenga user-select desactivado */
+#editor-panel { user-select: text; }
+
+#zoom-controls {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.14);
+}
+
+#zoom-controls button {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+#zoom-controls button:hover { background: #eef1f6; }
+
+#zoom-reset {
+  font-size: 11px !important;
+  min-width: 42px !important;
+  color: var(--muted);
+}
+
+#canvas-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 10;
+  font-size: 11px;
+  color: var(--muted);
+  background: rgba(255,255,255,.85);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+
+#canvas-hint.faded { opacity: 0; }
+
+#btn-legend {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  padding: 0;
+  font-weight: 700;
+  background: var(--panel);
+  box-shadow: 0 2px 10px rgba(0,0,0,.14);
+}
+
+#legend-panel {
+  position: absolute;
+  bottom: 56px;
+  left: 18px;
+  z-index: 11;
+  width: 270px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.16);
+  padding: 12px 14px;
+}
+
+#legend-panel.hidden { display: none; }
+
+/* Bloque estático de simbología, solo visible durante la exportación a PNG
+   (#export-legend / exportMode) — vive DENTRO de #tree-viewport para que
+   quede en la misma captura que el árbol, en vez de un panel flotante
+   aparte que terminaba recortado al componerlo en otro canvas. */
+#export-legend {
+  width: 340px;
+  margin: 40px auto 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.10);
+  padding: 14px 16px;
+}
+
+#export-legend.hidden { display: none; }
+
+#export-legend > strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.legend-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  padding: 3px 0;
+  color: var(--text);
+}
+
+.legend-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,.12);
+}
+
+.legend-superior-titulo { background: #b8cce4; }
+.legend-superior-intencion { background: #dbe6f3; }
+.legend-titulo { background: hsl(221 65% 93%); border-left: 3px solid hsl(221 55% 45%); }
+.legend-intencion { background: hsl(221 40% 97%); border-left: 3px solid hsl(221 30% 65%); }
+.legend-policy { background: hsl(221 55% 92%); border-radius: 9px; }
+.legend-metric-valor { background: hsl(221 30% 96%); border-left: 3px solid #10b981; }
+.legend-metric-control { background: hsl(221 30% 96%); border-left: 3px solid #f59e0b; }
+
+.legend-note {
+  margin: 8px 0 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.legend-divider {
+  margin: 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.legend-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+/* --- Árbol tipo organigrama (CSS puro, técnica clásica) ---
+   Cada <li> dibuja su propia mitad de línea horizontal (::before = mitad
+   izquierda, ::after = mitad derecha + el tramo vertical hacia su tarjeta).
+   El primer hijo no necesita mitad izquierda; el último no necesita mitad
+   derecha; un hijo único no necesita ninguna línea horizontal. El <ul>
+   anidado dibuja el tramo vertical que baja desde la tarjeta padre. */
+.tree, .tree ul, .tree li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.tree {
+  display: flex;
+}
+
+.tree ul {
+  display: flex;
+  padding-top: 30px;
+  position: relative;
+}
+
+.tree li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 14px 0 14px;
+  position: relative;
+}
+
+.tree li::before,
+.tree li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 50%;
+  width: 50%;
+  height: 30px;
+  border-top: 2px solid var(--line);
+}
+
+.tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: 2px solid var(--line);
+}
+
+.tree li:only-child {
+  padding-top: 0;
+}
+
+.tree li:only-child::before,
+.tree li:only-child::after {
+  display: none;
+}
+
+.tree li:first-child::before {
+  border: none;
+}
+
+.tree li:last-child::after {
+  border: none;
+}
+
+.tree li:first-child::after {
+  border-radius: 6px 0 0 0;
+}
+
+.tree li:last-child::before {
+  border-right: 2px solid var(--line);
+  border-radius: 0 6px 0 0;
+}
+
+/* Tramo vertical que baja desde la tarjeta padre hasta la barra horizontal
+   de sus hijos */
+.tree ul ul::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  border-left: 2px solid var(--line);
+  width: 0;
+  height: 30px;
+}
+
+/* --- Tarjeta de nodo --- */
+.node-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  /* Sin position:relative aquí, .node-actions/.toggle-btn (position:absolute)
+     se anclaban al <li> completo, que se ensancha según cuántos hijos
+     cuelguen del nodo — por eso se corrían a la derecha. Al fijar el
+     contexto aquí, quedan anclados al ancho real de la tarjeta. */
+}
+
+/* --- Paleta por nivel de profundidad ---
+   Cada nivel (1-5, luego se repite) define un solo matiz (--lvl-h); los 6
+   tipos del framework (Aplicación Superior, Intención Superior, Aplicación
+   de valor, Intención Subyacente, Política, Métrica) son variaciones de
+   saturación/luminosidad de ESE matiz, para que "de un vistazo" se note
+   tanto el nivel (color base) como el tipo (tono dentro de esa familia). */
+.level-1 { --lvl-h: 221; }
+.level-2 { --lvl-h: 262; }
+.level-3 { --lvl-h: 174; }
+.level-4 { --lvl-h: 339; }
+.level-5 { --lvl-h: 29; }
+
+.node-card {
+  width: var(--card-w);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06);
+  overflow: hidden;
+  text-align: left;
+  position: relative;
+  cursor: pointer;
+  transition: box-shadow .15s, border-color .15s;
+}
+
+.node-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(59,91,219,.18);
+}
+
+.node-card.root-card {
+  width: 320px;
+  text-align: center;
+  border-color: #7f9cc9;
+}
+
+/* Aplicación de valor / Aplicación Superior */
+.node-card .titulo {
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.32;
+  padding: 9px 11px 6px 11px;
+  background: hsl(var(--lvl-h, 221) 65% 93%);
+  color: hsl(var(--lvl-h, 221) 55% 25%);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.node-card.root-card .titulo {
+  background: #b8cce4;
+  color: #1f2430;
+  font-size: 13px;
+}
+
+/* Pregunta: solo caption de apoyo, sin banda de color propia */
+.node-card .pregunta {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.3;
+  padding: 4px 11px 0 11px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* Intención Subyacente / Intención Superior */
+.node-card .intencion-band {
+  font-size: 10.5px;
+  line-height: 1.32;
+  padding: 6px 11px 9px 11px;
+  background: hsl(var(--lvl-h, 221) 40% 97%);
+  color: hsl(var(--lvl-h, 221) 30% 38%);
+  border-top: 1px dashed hsl(var(--lvl-h, 221) 35% 85%);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.node-card.root-card .intencion-band {
+  background: #dbe6f3;
+  color: #33465f;
+  border-top-color: #a9c0dc;
+}
+
+/* --- Ramas laterales: burbujas de Políticas (izquierda) y Métricas (derecha) --- */
+/* Fondo de grupo: TODO el conjunto de una Aplicación de valor (políticas +
+   tarjeta + métricas) comparte un solo fondo/borde, para que se lea como
+   una unidad y no se confunda con el grupo del nodo vecino. Tinte sutil
+   del matiz de nivel (--lvl-h), heredado desde el <li>. */
+.node-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: hsl(var(--lvl-h, 221) 45% 97.5%);
+  border: 1px solid hsl(var(--lvl-h, 221) 35% 88%);
+  border-radius: 22px;
+  padding: 8px 2px;
+}
+
+/* Círculo de categoría: esquina superior derecha del grupo completo
+   (políticas + tarjeta + métricas). Ahora es un botón clicable que abre
+   un popover para asignar/cambiar/quitar la categoría sin pasar por el
+   sidebar — cuando el nodo no tiene categoría, queda oculto (solo visible
+   al pasar el mouse, o mientras su propio popover está abierto) para no
+   ensuciar el canvas con un "+" permanente en cada nodo. */
+.category-picker {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  z-index: 3;
+}
+
+.category-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  border: 2px solid var(--panel);
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  padding: 0;
+  cursor: pointer;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.category-picker-empty .category-badge {
+  background: var(--panel);
+  border-style: dashed;
+  border-color: var(--muted);
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity .12s;
+}
+
+.node-row:hover .category-picker-empty .category-badge,
+.category-picker-empty.open .category-badge {
+  opacity: 1;
+}
+
+.category-picker-menu {
+  position: absolute;
+  top: 26px;
+  right: 0;
+  z-index: 40;
+  width: 200px;
+  max-height: 240px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+}
+
+.category-picker-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.category-picker-option:hover { background: #eef1f6; }
+
+.category-picker-option.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.category-picker-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  flex-shrink: 0;
+}
+
+.category-picker-empty-note {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 6px 8px;
+  margin: 0;
+}
+
+.policy-branch, .metric-branch {
+  width: 185px;
+  min-width: 185px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.policy-branch { padding: 12px 22px 12px 12px; align-items: flex-end; }
+.metric-branch { padding: 12px 12px 12px 22px; align-items: flex-start; }
+
+.policy-branch.has-items::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; right: 0;
+  border-right: 2px solid var(--line);
+}
+.metric-branch.has-items::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  border-left: 2px solid var(--line);
+}
+
+.branch-item { position: relative; }
+
+.policy-branch .branch-item::before {
+  content: '';
+  position: absolute;
+  right: -22px;
+  top: 50%;
+  width: 22px;
+  border-top: 2px solid var(--line);
+}
+.metric-branch .branch-item::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  width: 22px;
+  border-top: 2px solid var(--line);
+}
+
+.bubble {
+  font-size: 10px;
+  line-height: 1.3;
+  padding: 5px 9px;
+  border-radius: 12px;
+  max-width: 165px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  transition: box-shadow .12s;
+}
+
+.bubble:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,.16);
+}
+
+/* Política: un solo tono, el matiz del nivel */
+.policy-bubble {
+  background: hsl(var(--lvl-h, 221) 55% 92%);
+  border-color: hsl(var(--lvl-h, 221) 40% 78%);
+  color: hsl(var(--lvl-h, 221) 55% 24%);
+}
+
+/* Métrica: mismo matiz de nivel, pero más clara; valor/control se
+   distinguen con un acento de borde izquierdo (verde/ámbar) encima del
+   matiz del nivel, no con un color totalmente distinto. */
+.metric-bubble {
+  background: hsl(var(--lvl-h, 221) 30% 96%);
+  border-color: hsl(var(--lvl-h, 221) 25% 85%);
+  color: hsl(var(--lvl-h, 221) 35% 32%);
+  border-left-width: 3px;
+}
+.metric-bubble.valor { border-left-color: #10b981; }
+.metric-bubble.control { border-left-color: #f59e0b; }
+
+/* Botones "+" para agregar política/métrica directo en el canvas, sin
+   pasar por el sidebar — visibles solo al pasar el mouse sobre el grupo,
+   igual que .node-actions, para no saturar el árbol en reposo. */
+.branch-add-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity .12s;
+}
+
+.node-row:hover .branch-add-row { opacity: 1; }
+
+.branch-add-btn {
+  font-size: 9px;
+  line-height: 1.2;
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: 1px dashed var(--muted);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.branch-add-btn:hover { background: #eef1f6; }
+
+.branch-add-btn.policy { border-color: hsl(var(--lvl-h, 221) 40% 60%); color: hsl(var(--lvl-h, 221) 45% 40%); }
+.branch-add-btn.valor { border-color: #10b981; color: #0d8f68; }
+.branch-add-btn.control { border-color: #f59e0b; color: #b9770e; }
+
+.node-actions {
+  position: absolute;
+  top: -12px;
+  right: 6px;
+  display: flex;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity .12s;
+}
+
+.node-card:hover .node-actions,
+.node-wrap:hover .node-actions {
+  opacity: 1;
+}
+
+.node-actions button {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+  border-radius: 50%;
+}
+
+.node-actions .add-child-btn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.node-actions .duplicate-btn {
+  background: #fff;
+  border-color: var(--accent);
+  color: var(--accent);
+  font-size: 11px;
+}
+
+.node-actions .disconnect-btn {
+  background: #fff;
+  border-color: #b8860b;
+  color: #8a6d1d;
+  font-size: 11px;
+}
+
+.node-actions .delete-btn {
+  background: #fff;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.toggle-btn {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+  background: var(--panel);
+  z-index: 2;
+}
+
+.children-collapsed { display: none !important; }
+
+/* --- Overlay + panel editor --- */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,22,30,.35);
+  z-index: 30;
+}
+
+#overlay.hidden { display: none; }
+
+#editor-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  max-width: 92vw;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  z-index: 31;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 16px rgba(0,0,0,.12);
+}
+
+#editor-panel.hidden { display: none; }
+
+.editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.editor-head h2 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  padding: 2px 6px;
+}
+
+#editor-form {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field-group { display: flex; flex-direction: column; gap: 12px; }
+.field-group.hidden { display: none; }
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+textarea, input[type=text], select {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  resize: vertical;
+}
+
+textarea:focus, input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.list-field-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.list-field-head span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.add-row-btn {
+  font-size: 11px;
+  padding: 3px 8px;
+}
+
+.dynamic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dynamic-row {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.dynamic-row textarea {
+  flex: 1;
+  min-height: 40px;
+}
+
+.remove-row-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: var(--danger);
+  border-color: var(--danger);
+  flex-shrink: 0;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+/* --- Modal de edición por-ítem (glassmorphism) ---
+   Editar solo la parte en la que se hizo clic (título, pregunta,
+   intención, una política o una métrica) sin abrir el panel lateral
+   completo. Vidrio esmerilado: fondo translúcido + blur del canvas detrás,
+   para que quede claro que es una capa flotante sobre el árbol, no otro
+   panel fijo más. */
+.glass-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 33;
+  width: 420px;
+  max-width: 90vw;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 12px 40px rgba(30, 40, 70, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.glass-modal.hidden { display: none; }
+
+.item-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.item-modal-head h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+#item-modal-textarea {
+  width: 100%;
+  min-height: 90px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(120, 130, 160, 0.35);
+  border-radius: 10px;
+  padding: 10px;
+  resize: vertical;
+}
+
+#item-modal-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.glass-modal .editor-actions {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.glass-modal .spacer { flex: 1; }
+
+/* --- Panel de categorías (compartidas entre proyectos) --- */
+#category-modal {
+  width: 380px;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+.category-row, .category-add-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-row input[type=text], .category-add-form input[type=text] {
+  flex: 1;
+}
+
+.category-row input[type=color], .category-add-form input[type=color] {
+  width: 30px;
+  height: 28px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.category-add-form {
+  padding-top: 10px;
+  border-top: 1px solid rgba(120, 130, 160, 0.35);
+}
+
+/* --- Selector de ícono Font Awesome (dropdown en grilla) --- */
+.icon-picker {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.icon-picker-trigger {
+  width: 30px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.icon-picker-menu {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  z-index: 40;
+  width: 216px;
+  max-height: 220px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  padding: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+}
+
+.icon-picker-option {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-picker-option:hover { background: #eef1f6; }
+
+.icon-picker-option.active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.legend-category-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 9px;
+  border: 1px solid rgba(0,0,0,.12);
+}
+
+.hidden { display: none !important; }
