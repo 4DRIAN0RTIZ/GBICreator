@@ -1,31 +1,81 @@
+import { makePolicy, makeMetric, removePolicyFromNode } from '../domain/tree.js';
+
+const METRIC_LISTS = new Set(['metricasValor', 'metricasControl']);
+
 export function EditorPanel({ node, draft, setDraft, onClose, onSave, onDelete, categories }) {
   if (!node || !draft) return null;
 
   const updateListItem = (listName, index, value) => {
     setDraft((current) => ({
       ...current,
-      [listName]: current[listName].map((item, itemIndex) => (itemIndex === index ? value : item)),
+      [listName]: current[listName].map((item, itemIndex) => (itemIndex === index ? { ...item, texto: value } : item)),
+    }));
+  };
+
+  const updateMetricOrigin = (listName, index, origenPoliticaId) => {
+    setDraft((current) => ({
+      ...current,
+      [listName]: current[listName].map((item, itemIndex) => (itemIndex === index ? { ...item, origenPoliticaId } : item)),
     }));
   };
 
   const removeListItem = (listName, index) => {
-    setDraft((current) => ({ ...current, [listName]: current[listName].filter((_, itemIndex) => itemIndex !== index) }));
+    setDraft((current) => {
+      if (listName !== 'politicas') {
+        return { ...current, [listName]: current[listName].filter((_, itemIndex) => itemIndex !== index) };
+      }
+      const policyId = current.politicas[index]?.id;
+      const next = {
+        ...current,
+        politicas: [...current.politicas],
+        metricasValor: [...current.metricasValor],
+        metricasControl: [...current.metricasControl],
+      };
+      removePolicyFromNode(next, policyId);
+      return next;
+    });
   };
 
   const addListItem = (listName) => {
-    setDraft((current) => ({ ...current, [listName]: [...current[listName], ''] }));
+    setDraft((current) => {
+      if (listName === 'politicas') return { ...current, politicas: [...current.politicas, makePolicy('')] };
+      const defaultOrigin = current.politicas[0]?.id ?? null;
+      return { ...current, [listName]: [...current[listName], makeMetric('', defaultOrigin)] };
+    });
   };
 
-  const renderDynamicList = (listName) => (
-    <div id={`list-${listName}`} className="dynamic-list">
-      {(draft[listName] || []).map((value, index) => (
-        <div className="dynamic-row" key={`${listName}-${index}`}>
-          <textarea rows="2" value={value} onChange={(event) => updateListItem(listName, index, event.target.value)} />
-          <button type="button" className="remove-row-btn" title="Quitar esta línea" onClick={() => removeListItem(listName, index)}>×</button>
-        </div>
-      ))}
-    </div>
-  );
+  const renderDynamicList = (listName) => {
+    const isMetric = METRIC_LISTS.has(listName);
+    return (
+      <div id={`list-${listName}`} className="dynamic-list">
+        {(draft[listName] || []).map((item, index) => {
+          const originMissing = isMetric && item.origenPoliticaId
+            && !draft.politicas.some((policy) => policy.id === item.origenPoliticaId);
+          return (
+            <div className="dynamic-row" key={item.id}>
+              <div className="dynamic-row-fields">
+                {isMetric ? (
+                  <select
+                    className={`origin-select${!item.origenPoliticaId ? ' origin-select-empty' : ''}`}
+                    value={item.origenPoliticaId || ''}
+                    onChange={(event) => updateMetricOrigin(listName, index, event.target.value || null)}
+                  >
+                    <option value="" disabled>— Elegí de qué política nace —</option>
+                    {draft.politicas.map((policy, policyIndex) => (
+                      <option key={policy.id} value={policy.id}>{`P${policyIndex + 1} · ${policy.texto || '(sin texto)'}`}</option>
+                    ))}
+                    {originMissing ? <option value={item.origenPoliticaId}>⚠ Política eliminada — reasignar</option> : null}
+                  </select>
+                ) : null}
+                <textarea rows="2" value={item.texto} onChange={(event) => updateListItem(listName, index, event.target.value)} />
+              </div>
+              <button type="button" className="remove-row-btn" title="Quitar esta línea" onClick={() => removeListItem(listName, index)}>×</button>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <aside id="editor-panel">
@@ -64,15 +114,25 @@ export function EditorPanel({ node, draft, setDraft, onClose, onSave, onDelete, 
             ['politicas', 'Políticas & Criterios de Valor', '+ Agregar política'],
             ['metricasValor', 'Métricas de valor', '+ Agregar métrica'],
             ['metricasControl', 'Métricas de control', '+ Agregar métrica'],
-          ].map(([listName, title, buttonText]) => (
-            <div className="list-field" key={listName}>
-              <div className="list-field-head">
-                <span>{title}</span>
-                <button type="button" className="add-row-btn" data-list={listName} onClick={() => addListItem(listName)}>{buttonText}</button>
+          ].map(([listName, title, buttonText]) => {
+            const blocked = METRIC_LISTS.has(listName) && !draft.politicas.length;
+            return (
+              <div className="list-field" key={listName}>
+                <div className="list-field-head">
+                  <span>{title}</span>
+                  <button
+                    type="button"
+                    className="add-row-btn"
+                    data-list={listName}
+                    disabled={blocked}
+                    title={blocked ? 'Agregá primero una política' : undefined}
+                    onClick={() => addListItem(listName)}
+                  >{buttonText}</button>
+                </div>
+                {renderDynamicList(listName)}
               </div>
-              {renderDynamicList(listName)}
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="editor-actions">

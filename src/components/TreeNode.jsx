@@ -1,12 +1,20 @@
 import { Branch } from './Branch.jsx';
 import { CategoryPicker } from './CategoryPicker.jsx';
+import { policyOriginMeta } from '../domain/tree.js';
 
 export function TreeNode({ node, depth = 0, actions, categories }) {
   const levelClass = !node.isRoot ? `level-${((depth - 1) % 5) + 1}` : '';
-  const policyItems = (node.politicas || []).map((text, index) => ({ text, cls: 'policy-bubble', field: 'politicas', index }));
+  const hasPolicies = (node.politicas || []).length > 0;
+  const policyItems = (node.politicas || []).map((policy, index) => ({
+    text: policy.texto, cls: 'policy-bubble', field: 'politicas', index, originLabel: `P${index + 1}`, originIndex: index % 6,
+  }));
   const metricItems = (node.metricasValor || [])
-    .map((text, index) => ({ text, cls: 'metric-bubble valor', field: 'metricasValor', index }))
-    .concat((node.metricasControl || []).map((text, index) => ({ text, cls: 'metric-bubble control', field: 'metricasControl', index })));
+    .map((metric, index) => ({
+      text: metric.texto, cls: 'metric-bubble valor', field: 'metricasValor', index, ...policyOriginMeta(node.politicas, metric.origenPoliticaId),
+    }))
+    .concat((node.metricasControl || []).map((metric, index) => ({
+      text: metric.texto, cls: 'metric-bubble control', field: 'metricasControl', index, ...policyOriginMeta(node.politicas, metric.origenPoliticaId),
+    })));
   const card = (
     <div className={`node-card${node.isRoot ? ' root-card' : ''}`} data-id={node.id}>
       {node.isRoot ? (
@@ -82,8 +90,22 @@ export function TreeNode({ node, depth = 0, actions, categories }) {
             items={metricItems}
             onEditItem={(field, index) => actions.openItem(null, node.id, field, index)}
             addButtons={[
-              { field: 'metricasValor', cls: 'valor', label: 'valor', title: 'Agregar métrica de valor', onClick: () => actions.openNewItem(node.id, 'metricasValor') },
-              { field: 'metricasControl', cls: 'control', label: 'control', title: 'Agregar métrica de control', onClick: () => actions.openNewItem(node.id, 'metricasControl') },
+              {
+                field: 'metricasValor',
+                cls: 'valor',
+                label: 'valor',
+                title: hasPolicies ? 'Agregar métrica de valor' : 'Agregá primero una política',
+                disabled: !hasPolicies,
+                onClick: () => actions.openNewItem(node.id, 'metricasValor'),
+              },
+              {
+                field: 'metricasControl',
+                cls: 'control',
+                label: 'control',
+                title: hasPolicies ? 'Agregar métrica de control' : 'Agregá primero una política',
+                disabled: !hasPolicies,
+                onClick: () => actions.openNewItem(node.id, 'metricasControl'),
+              },
             ]}
           />
           <CategoryPicker node={node} categories={categories} onSetCategory={(categoryId) => actions.setCategory(node.id, categoryId)} />
