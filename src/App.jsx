@@ -198,6 +198,9 @@ export default function App() {
         itemEdit={itemEditor.currentItemEdit}
         text={itemEditor.itemText}
         setText={itemEditor.setItemText}
+        origin={itemEditor.itemOrigin}
+        setOrigin={itemEditor.setItemOrigin}
+        policies={itemEditor.itemPolicies}
         onClose={itemEditor.closeItemModal}
         onDelete={itemEditor.deleteItemEdit}
         onSave={itemEditor.saveItemEdit}

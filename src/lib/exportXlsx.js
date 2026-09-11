@@ -1,5 +1,10 @@
 import ExcelJS from 'exceljs';
-import { flattenValueNodes } from '../domain/tree.js';
+import { flattenValueNodes, policyOriginMeta } from '../domain/tree.js';
+
+function metricLabel(politicas, metric) {
+  const { originLabel } = policyOriginMeta(politicas, metric.origenPoliticaId);
+  return `[${originLabel}] ${metric.texto}`;
+}
 
 // Replica la estructura del tablero de referencia de gobernanza ITAM, pero en
 // vez de aplanar todo el árbol en una sola fila de bloques, cada hijo de
@@ -74,17 +79,20 @@ export async function exportTreeAsXlsx(data, filename) {
     mergedCell(rIntencionHeader, c1, rIntencionHeader, c2, 'Intencion Subyacente', { fill: HEADER_FILL, bold: true, border: true });
     mergedCell(rIntencion, c1, rIntencion + 3, c2, node.intencionSubyacente, { alignment: CENTER_TOP_WRAP, border: true });
 
+    const politicas = node.politicas || [];
     mergedCell(rPoliticasHeader, c1, rPoliticasHeader, c2, 'Tablero de Politicas & Criterios de Valor', { fill: HEADER_FILL, bold: true, border: true });
-    mergedCell(rPoliticas, c1, rPoliticas + 4, c2, (node.politicas || []).join('\n'), { alignment: CENTER_TOP_WRAP, border: true });
+    mergedCell(rPoliticas, c1, rPoliticas + 4, c2, politicas.map((policy, index) => `[P${index + 1}] ${policy.texto}`).join('\n'), { alignment: CENTER_TOP_WRAP, border: true });
 
     mergedCell(rMetValorHeader, c1, rMetValorHeader, c2, 'Metricas de valor', { fill: HEADER_FILL, bold: true, border: true });
     for (let i = 0; i < maxValor; i += 1) {
-      mergedCell(rMetValor + i, c1, rMetValor + i, c2, node.metricasValor?.[i] || '', { alignment: CENTER_WRAP, border: true });
+      const metric = node.metricasValor?.[i];
+      mergedCell(rMetValor + i, c1, rMetValor + i, c2, metric ? metricLabel(politicas, metric) : '', { alignment: CENTER_WRAP, border: true });
     }
 
     mergedCell(rMetControlHeader, c1, rMetControlHeader, c2, 'Metricas de control', { fill: HEADER_FILL, bold: true, border: true });
     for (let i = 0; i < maxControl; i += 1) {
-      mergedCell(rMetControl + i, c1, rMetControl + i, c2, node.metricasControl?.[i] || '', { alignment: CENTER_WRAP, border: true });
+      const metric = node.metricasControl?.[i];
+      mergedCell(rMetControl + i, c1, rMetControl + i, c2, metric ? metricLabel(politicas, metric) : '', { alignment: CENTER_WRAP, border: true });
     }
   };
 

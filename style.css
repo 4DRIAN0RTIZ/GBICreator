@@ -987,6 +987,12 @@ textarea:focus, input:focus, select:focus {
   border-color: var(--accent);
 }
 
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .list-field-head {
   display: flex;
   align-items: center;
@@ -1017,10 +1023,64 @@ textarea:focus, input:focus, select:focus {
   align-items: flex-start;
 }
 
-.dynamic-row textarea {
+.dynamic-row-fields {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dynamic-row-fields textarea {
   min-height: 40px;
 }
+
+.origin-select {
+  font-size: 11px;
+  padding: 4px 6px;
+}
+
+.origin-select-empty {
+  border-color: var(--danger);
+}
+
+.origin-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.field-hint.warning {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--danger);
+  margin: 0;
+}
+
+/* Señal visual de trazabilidad: la política y las métricas que nacen de
+   ella comparten el mismo badge de color/letra (P1, P2...). Sin esto no
+   hay forma de saber, a simple vista, qué métrica mide el cumplimiento de
+   qué política dentro de un mismo nodo. */
+.origin-badge {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+.origin-badge[data-origin-index="0"] { background: #dbeafe; color: #1d4ed8; }
+.origin-badge[data-origin-index="1"] { background: #dcfce7; color: #15803d; }
+.origin-badge[data-origin-index="2"] { background: #fef3c7; color: #b45309; }
+.origin-badge[data-origin-index="3"] { background: #fce7f3; color: #be185d; }
+.origin-badge[data-origin-index="4"] { background: #ede9fe; color: #6d28d9; }
+.origin-badge[data-origin-index="5"] { background: #cffafe; color: #0e7490; }
+.origin-badge.origin-unassigned { background: #fee2e2; color: #b91c1c; }
 
 .remove-row-btn {
   width: 26px;

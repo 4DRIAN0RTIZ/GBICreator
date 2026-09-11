@@ -8,6 +8,7 @@ import {
   detachNodeById,
   insertNodeAfterSibling,
   setCollapsedRecursive,
+  sanitizeMetricList,
 } from '../domain/tree.js';
 
 // Combina el estado del panel de edición con las acciones que mutan el
@@ -45,9 +46,15 @@ export function useTreeEditor(data, mutateData) {
         node.titulo = (editorDraft.titulo || '').trim() || 'Quiero...';
         node.pregunta = (editorDraft.pregunta || '').trim();
         node.intencionSubyacente = (editorDraft.intencionSubyacente || '').trim();
-        node.politicas = (editorDraft.politicas || []).map((item) => item.trim()).filter(Boolean);
-        node.metricasValor = (editorDraft.metricasValor || []).map((item) => item.trim()).filter(Boolean);
-        node.metricasControl = (editorDraft.metricasControl || []).map((item) => item.trim()).filter(Boolean);
+
+        const politicas = (editorDraft.politicas || [])
+          .map((item) => ({ id: item.id, texto: (item.texto || '').trim() }))
+          .filter((item) => item.texto);
+        const validPolicyIds = new Set(politicas.map((policy) => policy.id));
+        const fallbackPolicyId = politicas[0]?.id ?? null;
+        node.politicas = politicas;
+        node.metricasValor = sanitizeMetricList(editorDraft.metricasValor, validPolicyIds, fallbackPolicyId);
+        node.metricasControl = sanitizeMetricList(editorDraft.metricasControl, validPolicyIds, fallbackPolicyId);
         node.categoriaId = editorDraft.categoriaId || null;
       }
     });
