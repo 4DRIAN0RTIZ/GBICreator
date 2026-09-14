@@ -1,0 +1,27 @@
+{
+  "project": "gbi-creator",
+  "description": "SPA React/Vite para modelar árboles de intención, políticas y métricas de gobierno de TI. Sirve de repositorio con arnés de Harness Engineering portado desde harness-sample.",
+  "rules": {
+    "one_feature_at_a_time": true,
+    "require_tests_to_close": true,
+    "valid_status": ["pending", "in_progress", "done", "blocked"]
+  },
+  "features": [
+    {
+      "id": 1,
+      "name": "sql_shared_persistence",
+      "title": "Persistencia compartida en backend + SQLite (reemplaza localStorage)",
+      "description": "Reemplazar la persistencia actual basada en localStorage (src/lib/storage.js, useProjects.js, useCategories.js) por un backend HTTP (Node/Express) respaldado por SQLite (better-sqlite3), para que proyectos y categorías se puedan compartir entre usuarios/dispositivos en vez de quedar aislados por navegador.",
+      "acceptance": [
+        "Existe un servicio backend (p.ej. server/) con Express que expone una API REST: GET/PUT /api/projects y GET/PUT /api/categories, respaldada por SQLite vía better-sqlite3",
+        "El esquema SQLite persiste al menos: proyectos (id, name, updatedAt, data JSON) y categorías (id, name, color, icon)",
+        "src/lib/storage.js deja de leer/escribir localStorage directamente y pasa a hacer fetch() contra la API del backend",
+        "useProjects.js y useCategories.js adaptan su useEffect de autoguardado a una operación async (fetch), manejando errores de red de forma explícita vía setSaveStatus, igual que hoy manejan localStorage lleno/bloqueado",
+        "Existe una migración o fallback: si el usuario tenía datos en las claves localStorage gbi-creator-*-v1 y el backend está vacío, se ofrece importarlos una vez a la nueva base",
+        "El Dockerfile/despliegue se actualiza para correr el backend Node además de servir el frontend estático (o se documenta como servicio separado), con el archivo .sqlite en un volumen persistente",
+        "Tests cubren: la capa storage.js (mockeando fetch) y al menos un test del backend que verifica que un POST persiste y un GET subsecuente lo recupera desde SQLite"
+      ],
+      "status": "done"
+    }
+  ]
+}

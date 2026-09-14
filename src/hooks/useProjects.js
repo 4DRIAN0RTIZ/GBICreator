@@ -1,30 +1,52 @@
 import { useEffect, useMemo, useState } from 'react';
 import { cloneData, makeBlankData, normalizeLoadedData, clearCategoryRecursive } from '../domain/tree.js';
 import { makeProject } from '../domain/project.js';
-import {
-  loadProjectState,
-  STORAGE_KEY,
-  PROJECTS_STORAGE_KEY,
-  CURRENT_PROJECT_KEY,
-} from '../lib/storage.js';
+import { loadProjectState, makeInitialProjectState, saveProjectState } from '../lib/storage.js';
 
 export function useProjects(setSaveStatus) {
-  const initialProjectState = useMemo(loadProjectState, []);
+  const initialProjectState = useMemo(makeInitialProjectState, []);
   const [projects, setProjects] = useState(initialProjectState.projects);
   const [currentProjectId, setCurrentProjectId] = useState(initialProjectState.currentProjectId);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const currentProject = projects.find((project) => project.id === currentProjectId) || projects[0];
   const data = currentProject?.data || makeBlankData();
 
   useEffect(() => {
-    try {
-      localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
-      localStorage.setItem(CURRENT_PROJECT_KEY, currentProjectId);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      setSaveStatus(`Guardado localmente ${new Date().toLocaleTimeString()}`);
-    } catch (_error) {
-      setSaveStatus('No se pudo autoguardar (localStorage lleno o bloqueado)');
-    }
-  }, [projects, currentProjectId, data, setSaveStatus]);
+    let active = true;
+    loadProjectState({
+      shouldImportLegacy: () => window.confirm('Hay proyectos guardados en este navegador y el backend está vacío. ¿Quieres importarlos a la base compartida?'),
+    })
+      .then((state) => {
+        if (!active) return;
+        setProjects(state.projects);
+        setCurrentProjectId(state.currentProjectId);
+        setHasLoaded(true);
+        setSaveStatus(`Datos cargados ${new Date().toLocaleTimeString()}`);
+      })
+      .catch(() => {
+        if (!active) return;
+        setHasLoaded(true);
+        setSaveStatus('No se pudieron cargar los proyectos desde el backend');
+      });
+    return () => {
+      active = false;
+    };
+  }, [setSaveStatus]);
+
+  useEffect(() => {
+    if (!hasLoaded) return;
+    let active = true;
+    saveProjectState({ projects, currentProjectId })
+      .then(() => {
+        if (active) setSaveStatus(`Guardado ${new Date().toLocaleTimeString()}`);
+      })
+      .catch(() => {
+        if (active) setSaveStatus('No se pudo autoguardar en el backend (red o servidor no disponible)');
+      });
+    return () => {
+      active = false;
+    };
+  }, [projects, currentProjectId, hasLoaded, setSaveStatus]);
 
   const mutateData = (mutator) => {
     setProjects((currentProjects) => currentProjects.map((project) => {

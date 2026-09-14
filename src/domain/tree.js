@@ -1,5 +1,5 @@
 export function genId() {
-  if (window.crypto?.randomUUID) return crypto.randomUUID();
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
   return `n-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
