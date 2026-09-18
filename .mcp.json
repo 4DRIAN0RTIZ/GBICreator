@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "gbi-creator": {
+      "command": "npm",
+      "args": ["run", "mcp"],
+      "env": {
+        "GBI_API_BASE_URL": "http://10.100.1.176:8081"
+      },
+      "lifecycle": "lazy"
+    }
+  }
+}

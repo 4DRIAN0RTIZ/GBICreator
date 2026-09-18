@@ -51,6 +51,11 @@ En desarrollo, Vite proxya `/api` a `http://localhost:3000`; levanta el
 frontend con `npm run dev` y el backend con `npm run dev:server`. En Docker,
 `node server/index.js` sirve tanto la API como los archivos estáticos.
 
+El servidor MCP (`npm run mcp`) es una capa read-only separada que consume la
+API HTTP existente (`GBI_API_BASE_URL`, por defecto `http://localhost:3000`) y
+expone herramientas de navegación para agentes. No escribe en SQLite ni cambia
+el contrato REST; ver `docs/mcp.md`.
+
 La única lectura permitida de `localStorage` queda acotada a la migración
 legada: si el backend está vacío y existen claves `gbi-creator-*-v1`, los hooks
 ofrecen importarlas una vez a la base compartida.

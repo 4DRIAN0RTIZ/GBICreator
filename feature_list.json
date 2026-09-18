@@ -22,6 +22,34 @@
         "Tests cubren: la capa storage.js (mockeando fetch) y al menos un test del backend que verifica que un POST persiste y un GET subsecuente lo recupera desde SQLite"
       ],
       "status": "done"
+    },
+    {
+      "id": 2,
+      "name": "readonly_mcp_navigation",
+      "title": "MCP de navegación read-only para proyectos GBI",
+      "description": "Agregar un servidor MCP local que consuma la API HTTP existente de proyectos y exponga herramientas read-only para listar el JSON completo, listar proyectos, navegar nodos de primer nivel y recorrer hijos por id.",
+      "acceptance": [
+        "Existe un script npm para levantar el MCP sin tocar la API REST existente",
+        "El MCP permite configurar la URL base del backend mediante variable de entorno y por defecto apunta al backend local",
+        "Hay herramientas para obtener el JSON completo de /api/projects, listar proyectos disponibles, listar nodos de primer nivel y listar hijos de un nodo por id",
+        "La lógica de navegación del árbol tiene tests unitarios que cubren root, nodos hijos, nodos sueltos y errores por id inexistente",
+        "La implementación queda documentada con un ejemplo de configuración del MCP"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 3,
+      "name": "readonly_mcp_analysis_tools",
+      "title": "Herramientas MCP read-only de búsqueda, outline, políticas, métricas y validación",
+      "description": "Ampliar el MCP read-only con herramientas analíticas para buscar nodos, exportar outline resumido, listar políticas, listar métricas y validar inconsistencias del proyecto.",
+      "acceptance": [
+        "El MCP expone herramientas para buscar nodos por texto y obtener un outline jerárquico del árbol",
+        "El MCP expone herramientas para listar políticas y métricas con referencia al nodo/política de origen",
+        "El MCP expone una herramienta de validación que detecta ids duplicados, métricas con origen roto y estructuras inválidas básicas",
+        "Los helpers tienen tests unitarios para búsqueda, outline, políticas, métricas y validación",
+        "docs/mcp.md documenta las nuevas herramientas"
+      ],
+      "status": "done"
     }
   ]
 }
