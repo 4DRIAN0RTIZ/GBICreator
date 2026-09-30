@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { findNode, findNodeIn, detachNodeById, flattenTreeForPicker } from '../domain/tree.js';
+import { showAlert } from '../lib/dialogs.js';
 
 export function useConnectModal(data, mutateData) {
   const [currentConnectId, setCurrentConnectId] = useState(null);
@@ -13,7 +14,7 @@ export function useConnectModal(data, mutateData) {
     const subtree = findNode(data, currentConnectId);
     if (!target || !subtree) return;
     if (findNodeIn(subtree, connectTarget)) {
-      alert('No se puede conectar un nodo dentro de su propio sub-árbol.');
+      showAlert({ title: 'Conexión no válida', text: 'No se puede conectar un nodo dentro de su propio sub-árbol.', icon: 'warning' });
       return;
     }
     mutateData((next) => {

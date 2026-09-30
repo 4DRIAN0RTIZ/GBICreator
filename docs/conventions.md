@@ -52,6 +52,16 @@ primero cargan desde API, evitan autoguardar hasta terminar esa carga inicial,
 y comunican errores de red o servidor vía `setSaveStatus` sin tragarlos en
 silencio.
 
+## Diálogos
+
+- **Nunca** uses `alert()`, `confirm()` ni `prompt()` nativos. Usa
+  `showAlert`, `showConfirm` y `showPrompt` de `src/lib/dialogs.js`
+  (CrystalAlert). Devuelven promesas: `showConfirm` resuelve `true` solo al
+  confirmar y `showPrompt` resuelve el texto o `null` si se cancela.
+- No importes `Crystal` directamente: el adaptador serializa los diálogos
+  porque CrystalAlert es un singleton sin cola. La librería está vendorizada en
+  `src/lib/vendor/crystal-alert/` (ver su README).
+
 ## Tests
 
 - Un archivo de test junto al módulo que prueba: `<módulo>.test.js` (Vitest).

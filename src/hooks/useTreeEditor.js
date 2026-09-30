@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { showConfirm } from '../lib/dialogs.js';
 import {
   findNode,
   cloneData,
@@ -61,7 +62,7 @@ export function useTreeEditor(data, mutateData) {
     closeEditor();
   };
 
-  const deleteNodeById = (id) => {
+  const deleteNodeById = async (id) => {
     const node = findNode(data, id);
     if (!node || node.isRoot) return;
     const label = node.titulo || 'este nodo';
@@ -69,7 +70,7 @@ export function useTreeEditor(data, mutateData) {
     const msg = childCount > 0
       ? `¿Eliminar "${label}" y sus ${childCount} nodo(s) hijo(s)? Esta acción no se puede deshacer.`
       : `¿Eliminar "${label}"? Esta acción no se puede deshacer.`;
-    if (!confirm(msg)) return;
+    if (!await showConfirm({ title: 'Eliminar nodo', text: msg, confirmText: 'Eliminar' })) return;
     mutateData((next) => detachNodeById(next, id));
     if (currentEditId === id) closeEditor();
   };
@@ -87,12 +88,18 @@ export function useTreeEditor(data, mutateData) {
     setEditorDraft(cloneData(nuevo));
   };
 
-  const disconnectNode = (event, id) => {
+  const disconnectNode = async (event, id) => {
     event?.stopPropagation();
     const node = findNode(data, id);
     if (!node || node.isRoot) return;
     const label = node.titulo || 'este nodo';
-    if (!confirm(`¿Desconectar "${label}" del árbol? Se mueve a Nodos aislados junto con lo que cuelgue de él, sin borrar nada.`)) return;
+    const confirmed = await showConfirm({
+      title: 'Desconectar nodo',
+      text: `¿Desconectar "${label}" del árbol? Se mueve a Nodos aislados junto con lo que cuelgue de él, sin borrar nada.`,
+      icon: 'info',
+      confirmText: 'Desconectar',
+    });
+    if (!confirmed) return;
     mutateData((next) => {
       const detached = detachNodeById(next, id);
       if (detached) next.sueltos.push(detached);
