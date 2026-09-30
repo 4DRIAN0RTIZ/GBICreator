@@ -5,6 +5,16 @@ All notable changes to GBI Creator will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-09-30
+
+### Bug Fixes
+- *(persistence)* Prevent data loss from failed loads and stale writers
+
+
+### Features
+- *(ui)* Replace native dialogs with crystalalert
+- *(mcp)* Add write tools and per-project access scope
+
 ## [0.4.0] - 2026-09-18
 
 ### Features
