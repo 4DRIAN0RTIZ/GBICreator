@@ -108,3 +108,31 @@ Sesión lista para archivar.
 ## Próximo paso
 
 Sesión lista para archivar.
+
+---
+
+## 2026-09-30 — Features #4–#7: carga segura, sincronización, snapshots y escritura MCP
+- **Agente:** Claude Opus 5.5, a pedido del usuario (perdió cambios y pidió escritura en el MCP).
+- **Diagnóstico:** (1) si la carga inicial fallaba, los hooks marcaban `hasLoaded` y el autoguardado hacía PUT del proyecto de ejemplo, borrando la base (el PUT reemplaza todo); (2) la UI nunca releía del backend: last-write-wins entre pestañas/personas.
+- **#4 `safe_initial_load`:** `src/lib/syncController.js` bloquea el autoguardado hasta cargar bien y reintenta cada 5 s.
+- **#5 `optimistic_revision_sync`:** `projectsRevision`/`categoriesRevision` en `metadata`; PUT exige `baseRevision` (409 + `current`); PUT idéntico = no-op. `GET /api/{projects,categories}/revision`. Un guardado en vuelo a la vez, `useRemotePolling` (5 s + focus), `SyncConflictBanner` (recargar / sobrescribir). La UI conserva el proyecto abierto al recibir cambios remotos.
+- **#6 `project_snapshots`:** tabla `project_snapshots`; snapshot previo por intervalo (5 min), por proyecto eliminado o por reducción >30 %; retención 100; listar/ver/restaurar. `GBI_SNAPSHOT_INTERVAL_MS`, `GBI_SNAPSHOT_LIMIT`.
+- **#7 `mcp_write_tools`:** `server/mcpMutations.js` (reutiliza `src/domain/tree.js`) + 13 herramientas de escritura y 2 de snapshots en `server/mcp.js`; `runMutation` reintenta ante 409. `GBI_MCP_READONLY=1` las desactiva.
+- **Compatibilidad:** sin migraciones destructivas; test con una base de esquema viejo confirma datos intactos. Pestañas abiertas con el bundle anterior reciben 409 y no pueden pisar datos: hay que recargarlas tras el deploy.
+- **Verificación:** `./init.sh` verde, 66/66 tests. E2E del MCP por stdio contra API temporal (agregar nodo/política/métrica, validación, borrar → snapshot `large_shrink`, restaurar). `npm run build` NO ejecutado por regla del usuario; JSX validado con `transformWithOxc`.
+
+---
+
+## 2026-09-30 — Feature #8 `crystal_alert_dialogs`
+- **Agente:** Claude Opus 5.5, a pedido del usuario (opción C: vendorizar).
+- **Hallazgos:** `crystal-alert` no existe en npm (404) y `src/crystal-alert.js` (main y v1.1.6) no exporta `Crystal`: como ES module queda inaccesible. Sin soporte de input. Singleton sin cola: un segundo `fire()` deja colgada la promesa del primero (pasaría con las dos confirmaciones de importación legada al arrancar).
+- **Cambios:** vendor v1.1.6 (commit c5472b1) en `src/lib/vendor/crystal-alert/` + `export default Crystal`. Adaptador `src/lib/dialogs.js` (`showAlert`, `showConfirm`, `showPrompt`) con cola; prompt mediante `html` + `<input class="ca-input">`, valor inicial por DOM y Enter para confirmar. Reemplazados los 13 usos nativos (App, useProjects, useCategories, useTreeEditor, useConnectModal); `shouldImportLegacy` ahora puede ser async. El Escape global de App corre en captura y se ignora si hay un diálogo de CrystalAlert abierto. Convención en `docs/conventions.md`.
+- **Verificación:** `./init.sh` verde, 73/73 tests. JSX validado con `transformWithOxc`; build y prueba en navegador no ejecutados.
+
+---
+
+## 2026-09-30 — Feature #9 `mcp_project_access_guardrail`
+- **Agente:** Claude Opus 5.5, a pedido del usuario (opción A: guardarraíl, no seguridad).
+- **Cambios:** `server/mcpAccess.js` (+ tests) parsea `GBI_MCP_PROJECTS` (`<id>:r|rw`, comodín `*`), filtra la vista de lectura, resuelve el proyecto objetivo con errores explícitos (fuera de alcance / solo lectura / inexistente) y recorta snapshots. En `server/mcp.js`: lecturas con vista filtrada; escrituras con `fetchAllProjects` (payload completo); `gbi_create_project` y `gbi_restore_snapshot` exigen `*:rw` o sin restricción; `gbi_list_projects` expone `access`.
+- **Bug evitado:** al introducir el filtro, `gbi_create_project` quedó usando la vista filtrada, lo que habría borrado los proyectos fuera de alcance vía PUT. Corregido y agregada una red de seguridad en `runMutation` (`assertNoProjectLost`): aborta si el borrador pierde algún proyecto.
+- **Verificación:** `./init.sh` verde. E2E con `itam:rw`: solo ve ITAM, edita ITAM, bloquea IPTM y la creación; IPTM intacto en BD.

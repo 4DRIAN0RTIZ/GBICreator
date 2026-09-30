@@ -4,7 +4,12 @@
   "rules": {
     "one_feature_at_a_time": true,
     "require_tests_to_close": true,
-    "valid_status": ["pending", "in_progress", "done", "blocked"]
+    "valid_status": [
+      "pending",
+      "in_progress",
+      "done",
+      "blocked"
+    ]
   },
   "features": [
     {
@@ -48,6 +53,88 @@
         "El MCP expone una herramienta de validación que detecta ids duplicados, métricas con origen roto y estructuras inválidas básicas",
         "Los helpers tienen tests unitarios para búsqueda, outline, políticas, métricas y validación",
         "docs/mcp.md documenta las nuevas herramientas"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 4,
+      "name": "safe_initial_load",
+      "title": "No autoguardar si la carga inicial desde el backend falla",
+      "description": "Hoy, si GET /api/projects o /api/categories falla, los hooks marcan hasLoaded=true y el autoguardado hace PUT del estado inicial (proyecto de ejemplo / categorías vacías), borrando toda la base compartida. La carga fallida debe bloquear el autoguardado y reintentar.",
+      "acceptance": [
+        "Si la carga inicial falla, no se ejecuta ningún PUT hacia el backend",
+        "La carga se reintenta automáticamente y el estado de guardado informa que los cambios no se guardarán hasta reconectar",
+        "Aplica tanto a proyectos como a categorías",
+        "Hay tests que cubren el caso de carga fallida sin escritura"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 5,
+      "name": "optimistic_revision_sync",
+      "title": "Revisión optimista (409) y sincronización de la UI con el backend",
+      "description": "Agregar una revisión a proyectos y categorías. Los PUT exigen baseRevision y responden 409 con el estado actual si está desfasada. La UI consulta la revisión periódicamente y al recuperar el foco, recarga si no tiene cambios pendientes y ofrece resolver conflictos sin perder datos locales.",
+      "acceptance": [
+        "GET /api/projects y /api/categories devuelven revision; existen GET /api/projects/revision y /api/categories/revision",
+        "PUT con baseRevision desfasada o ausente responde 409 con el estado actual; un PUT sin cambios reales no incrementa la revisión",
+        "La UI serializa los guardados (uno en vuelo a la vez) para no autogenerarse 409",
+        "La UI recarga cambios remotos cuando no hay cambios locales pendientes, conservando el proyecto seleccionado localmente",
+        "Ante un 409 la UI conserva los cambios locales y permite elegir recargar del servidor o sobrescribir",
+        "El controlador de sincronización tiene tests unitarios y el backend tiene tests del 409"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 6,
+      "name": "project_snapshots",
+      "title": "Snapshots automáticos de proyectos antes de escribir",
+      "description": "Guardar en SQLite el estado previo de los proyectos antes de escrituras, con throttling por tiempo, snapshot forzado ante borrados grandes y retención limitada. Exponer listado, detalle y restauración.",
+      "acceptance": [
+        "Se guarda snapshot antes de un PUT si el último tiene más de N minutos, o si el PUT elimina proyectos o reduce mucho el tamaño",
+        "La retención está limitada y es configurable por variable de entorno",
+        "Existen endpoints para listar, ver y restaurar un snapshot; restaurar genera snapshot previo e incrementa la revisión",
+        "Hay tests del backend para creación, throttling, retención y restauración"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 7,
+      "name": "mcp_write_tools",
+      "title": "Herramientas MCP de escritura sobre proyectos GBI",
+      "description": "Agregar herramientas de escritura al MCP (raíz, nodos, políticas, métricas, proyectos y snapshots) usando read-modify-write con baseRevision y reintento ante 409.",
+      "acceptance": [
+        "Las mutaciones son funciones puras testeadas que reutilizan src/domain/tree.js",
+        "El MCP escribe con baseRevision y reintenta ante 409",
+        "Hay herramientas para editar raíz y nodos, agregar/mover/borrar nodos, CRUD de políticas y métricas, crear proyecto y listar/restaurar snapshots",
+        "docs/mcp.md documenta las herramientas de escritura"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 8,
+      "name": "crystal_alert_dialogs",
+      "title": "Reemplazar alert/confirm/prompt nativos por CrystalAlert",
+      "description": "Integrar CrystalAlert (vendorizado en src/lib/vendor/crystal-alert/ con export ESM, porque no está en npm y el archivo no exporta) detrás de un adaptador src/lib/dialogs.js con cola, y reemplazar todos los alert/confirm/prompt nativos de la app.",
+      "acceptance": [
+        "No quedan llamadas a alert(), confirm() ni prompt() nativos en src/",
+        "src/lib/dialogs.js expone showAlert, showConfirm y showPrompt basados en promesas y serializa los diálogos (CrystalAlert es un singleton sin cola)",
+        "showPrompt soporta valor inicial, Enter para confirmar y devuelve null al cancelar",
+        "La importación legada (shouldImportLegacy) admite confirmación async",
+        "dialogs.js tiene tests unitarios con un Crystal simulado"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 9,
+      "name": "mcp_project_access_guardrail",
+      "title": "Guardarraíl de acceso por proyecto en el MCP (GBI_MCP_PROJECTS)",
+      "description": "Permitir limitar desde la config del MCP qué proyectos puede leer (r) o editar (rw) el agente. Es un guardarraíl contra errores del agente, NO seguridad: la API sigue sin autenticación.",
+      "acceptance": [
+        "GBI_MCP_PROJECTS acepta entradas <projectId>:r|rw separadas por coma y un comodín *:r|rw; sin la variable no hay restricción",
+        "Las herramientas de lectura solo ven proyectos legibles; un projectId fuera de alcance da un error explícito",
+        "Las escrituras solo se permiten en proyectos rw y siguen enviando el payload completo para no borrar proyectos ajenos",
+        "Snapshots: listar/ver solo muestran proyectos legibles; restaurar y crear proyecto requieren acceso sin restricción o *:rw",
+        "La lógica de acceso tiene tests unitarios y docs/mcp.md documenta que no es un mecanismo de seguridad"
       ],
       "status": "done"
     }
