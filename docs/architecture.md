@@ -42,7 +42,7 @@ usuario  ─→  componentes (src/components/)
               │
               ├─ hooks (useProjects, useCategories) mutan estado de React
               │
-              └─→  useEffect de autoguardado ─→ fetch() a la API del backend
+              └─→  useEffect de autoguardado ─→ syncController ─→ fetch() a la API del backend
                        │
                        └─→  Express (server/) ─→ SQLite (better-sqlite3)
 ```
@@ -51,10 +51,19 @@ En desarrollo, Vite proxya `/api` a `http://localhost:3000`; levanta el
 frontend con `npm run dev` y el backend con `npm run dev:server`. En Docker,
 `node server/index.js` sirve tanto la API como los archivos estáticos.
 
-El servidor MCP (`npm run mcp`) es una capa read-only separada que consume la
-API HTTP existente (`GBI_API_BASE_URL`, por defecto `http://localhost:3000`) y
-expone herramientas de navegación para agentes. No escribe en SQLite ni cambia
-el contrato REST; ver `docs/mcp.md`.
+Hay varios escritores sobre la misma base (pestañas, personas, el MCP) y el
+`PUT` reemplaza el conjunto completo, así que la persistencia usa control de
+concurrencia optimista: cada escritura declara `baseRevision` y el backend
+responde 409 si alguien escribió después. `src/lib/syncController.js` coordina
+en la UI la carga inicial (sin autoguardar hasta cargar bien), un solo guardado
+en vuelo, la recarga de cambios remotos y los conflictos. El backend guarda
+snapshots en `project_snapshots` antes de escrituras relevantes.
+
+El servidor MCP (`npm run mcp`) es una capa separada que consume la API HTTP
+(`GBI_API_BASE_URL`, por defecto `http://localhost:3000`): navega y edita
+proyectos mediante read-modify-write con `baseRevision`, reutilizando las
+reglas de `src/domain/tree.js`. No accede a SQLite directamente; ver
+`docs/mcp.md`.
 
 La única lectura permitida de `localStorage` queda acotada a la migración
 legada: si el backend está vacío y existen claves `gbi-creator-*-v1`, los hooks

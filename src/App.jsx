@@ -3,6 +3,7 @@ import { safeFilename } from './lib/filename.js';
 import { downloadJson } from './lib/downloadJson.js';
 import { exportTreeAsPng } from './lib/exportPng.js';
 import { exportTreeAsXlsx } from './lib/exportXlsx.js';
+import { showAlert, showConfirm } from './lib/dialogs.js';
 import { useProjects } from './hooks/useProjects.js';
 import { useCategories } from './hooks/useCategories.js';
 import { useCanvasView } from './hooks/useCanvasView.js';
@@ -17,6 +18,7 @@ import { CategoryPanel } from './components/CategoryPanel.jsx';
 import { Legend, LegendRows } from './components/Legend.jsx';
 import { ConnectModal } from './components/ConnectModal.jsx';
 import { ItemModal } from './components/ItemModal.jsx';
+import { SyncConflictBanner } from './components/SyncConflictBanner.jsx';
 
 export default function App() {
   const [saveStatus, setSaveStatus] = useState('');
@@ -44,14 +46,18 @@ export default function App() {
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.key !== 'Escape') return;
+      // Escape sobre un diálogo de CrystalAlert solo cierra ese diálogo.
+      if (document.querySelector('.ca-overlay.ca-show')) return;
       closeAllModals();
     };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    // Fase de captura: corre antes que el listener de CrystalAlert, que al
+    // cerrar quita .ca-show de inmediato.
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => document.removeEventListener('keydown', onKeyDown, true);
   });
 
-  const handleCreateProject = () => {
-    projects.createProject();
+  const handleCreateProject = async () => {
+    await projects.createProject();
     closeAllModals();
     requestAnimationFrame(canvas.fitToScreen);
   };
@@ -66,10 +72,15 @@ export default function App() {
     projects.loadFile(event, () => requestAnimationFrame(canvas.fitToScreen));
   };
 
-  const deleteCategory = (id) => {
+  const deleteCategory = async (id) => {
     const category = categoriesApi.categories.find((item) => item.id === id);
     if (!category) return;
-    if (!confirm(`¿Eliminar la categoría "${category.name}"? Los nodos que la tengan asignada quedan sin categoría (vuelven al color por nivel) en todos los proyectos.`)) return;
+    const confirmed = await showConfirm({
+      title: 'Eliminar categoría',
+      text: `¿Eliminar la categoría "${category.name}"? Los nodos que la tengan asignada quedan sin categoría (vuelven al color por nivel) en todos los proyectos.`,
+      confirmText: 'Eliminar',
+    });
+    if (!confirmed) return;
     categoriesApi.removeCategory(id);
     projects.clearCategoryEverywhere(id);
   };
@@ -88,7 +99,7 @@ export default function App() {
       setSaveStatus(`PNG exportado ${new Date().toLocaleTimeString()}`);
     } catch (error) {
       setSaveStatus('No se pudo exportar el PNG');
-      alert(`No se pudo exportar la imagen: ${error.message}`);
+      showAlert({ title: 'Exportación fallida', text: `No se pudo exportar la imagen: ${error.message}` });
     } finally {
       setExportMode(false);
     }
@@ -101,7 +112,7 @@ export default function App() {
       setSaveStatus(`XLSX exportado ${new Date().toLocaleTimeString()}`);
     } catch (error) {
       setSaveStatus('No se pudo exportar el XLSX');
-      alert(`No se pudo exportar el Excel: ${error.message}`);
+      showAlert({ title: 'Exportación fallida', text: `No se pudo exportar el Excel: ${error.message}` });
     }
   };
 
@@ -136,6 +147,21 @@ export default function App() {
         onCollapseAll={() => treeEditor.setCollapsedEverywhere(true)}
         saveStatus={saveStatus}
       />
+
+      {projects.hasConflict && (
+        <SyncConflictBanner
+          label="los proyectos"
+          onReloadFromServer={projects.reloadFromServer}
+          onOverwriteServer={projects.overwriteServer}
+        />
+      )}
+      {categoriesApi.hasConflict && (
+        <SyncConflictBanner
+          label="las categorías"
+          onReloadFromServer={categoriesApi.reloadFromServer}
+          onOverwriteServer={categoriesApi.overwriteServer}
+        />
+      )}
 
       <IsolatedTray
         nodes={projects.data.sueltos}

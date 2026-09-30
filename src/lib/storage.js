@@ -20,7 +20,10 @@ async function requestJson(path, options = {}) {
   });
   if (!response.ok) {
     const details = await response.json().catch(() => ({}));
-    throw new Error(details.error || `HTTP ${response.status}`);
+    const error = new Error(details.error || `HTTP ${response.status}`);
+    error.status = response.status;
+    error.details = details;
+    throw error;
   }
   return response.json();
 }
@@ -41,7 +44,17 @@ function normalizeProjectState(payload) {
   const currentProjectId = projects.some((project) => project.id === payload?.currentProjectId)
     ? payload.currentProjectId
     : projects[0]?.id;
-  return { projects, currentProjectId };
+  return { projects, currentProjectId, revision: Number(payload?.revision || 0) };
+}
+
+// Un 409 trae el estado vigente del servidor; se adjunta como `conflict`
+// ({ value, revision }) para que quien guarda decida sin perder sus cambios.
+function withConflict(error, toValue) {
+  if (error.status === 409 && error.details?.current) {
+    const current = error.details.current;
+    error.conflict = { value: toValue(current), revision: Number(current.revision || 0) };
+  }
+  return error;
 }
 
 function normalizeCategories(categories) {
@@ -113,38 +126,59 @@ export function makeInitialProjectState() {
 
 export async function loadProjectState({ shouldImportLegacy = () => false } = {}) {
   const payload = await requestJson('/api/projects');
-  if (payload.isEmpty && hasLegacyProjectState() && shouldImportLegacy()) {
+  if (payload.isEmpty && hasLegacyProjectState() && await shouldImportLegacy()) {
     const legacyState = loadLegacyProjectState();
-    await saveProjectState(legacyState);
-    return legacyState;
+    const saved = await saveProjectState(legacyState, payload.revision);
+    return { ...legacyState, revision: saved.revision };
   }
 
   const normalized = normalizeProjectState(payload);
-  return normalized.projects.length ? normalized : makeInitialProjectState();
+  return normalized.projects.length ? normalized : { ...makeInitialProjectState(), revision: normalized.revision };
 }
 
-export async function saveProjectState({ projects, currentProjectId }) {
-  const payload = await requestJson('/api/projects', {
-    method: 'PUT',
-    body: JSON.stringify({ projects, currentProjectId }),
-  });
-  return normalizeProjectState(payload);
+export async function saveProjectState({ projects, currentProjectId }, baseRevision) {
+  try {
+    const payload = await requestJson('/api/projects', {
+      method: 'PUT',
+      body: JSON.stringify({ projects, currentProjectId, baseRevision }),
+    });
+    return normalizeProjectState(payload);
+  } catch (error) {
+    throw withConflict(error, (current) => {
+      const { projects: currentProjects, currentProjectId: currentId } = normalizeProjectState(current);
+      return { projects: currentProjects, currentProjectId: currentId };
+    });
+  }
+}
+
+export async function fetchProjectsRevision() {
+  const payload = await requestJson('/api/projects/revision');
+  return Number(payload.revision || 0);
 }
 
 export async function loadCategories({ shouldImportLegacy = () => false } = {}) {
   const payload = await requestJson('/api/categories');
-  if (payload.isEmpty && hasLegacyCategories() && shouldImportLegacy()) {
+  if (payload.isEmpty && hasLegacyCategories() && await shouldImportLegacy()) {
     const legacyCategories = loadLegacyCategories();
-    await saveCategories(legacyCategories);
-    return legacyCategories;
+    const saved = await saveCategories(legacyCategories, payload.revision);
+    return { categories: legacyCategories, revision: saved.revision };
   }
-  return normalizeCategories(payload.categories);
+  return { categories: normalizeCategories(payload.categories), revision: Number(payload.revision || 0) };
 }
 
-export async function saveCategories(categories) {
-  const payload = await requestJson('/api/categories', {
-    method: 'PUT',
-    body: JSON.stringify({ categories }),
-  });
-  return normalizeCategories(payload.categories);
+export async function saveCategories(categories, baseRevision) {
+  try {
+    const payload = await requestJson('/api/categories', {
+      method: 'PUT',
+      body: JSON.stringify({ categories, baseRevision }),
+    });
+    return { categories: normalizeCategories(payload.categories), revision: Number(payload.revision || 0) };
+  } catch (error) {
+    throw withConflict(error, (current) => normalizeCategories(current.categories));
+  }
+}
+
+export async function fetchCategoriesRevision() {
+  const payload = await requestJson('/api/categories/revision');
+  return Number(payload.revision || 0);
 }
